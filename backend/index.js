@@ -8,4 +8,19 @@ app.use(cors());
 app.use(express.json());
 app.use();
 
-app.listen(httpsPort);
+// build the https server:
+
+// (1) ssl certificate info
+const fs = require('fs');
+const options = {
+  cert: fs.readFileSync('/opt/bitnami/apache/conf/api.bigdevdog.com.crt'),
+  key: fs.readFileSync('/opt/bitnami/apache/conf/api.bigdevdog.com.key')
+};
+
+// (2) start server to use app
+const https = require('https');
+const httpsServer = https.createServer(options, app);
+const httpsPort = 4043;
+httpsServer.listen(httpsPort, () => {
+  console.log(`https app listening at port ${httpsPort}`);
+});
