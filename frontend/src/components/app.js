@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import WelcomePage from './welcome_page';
-import CreateAcct from './create_acct';
-import SignIn from './sign_in';
-import FourOhFour from './four_oh_four';
+import WelcomePage from '../welcome_page';
+import CreateAcct from '../create_acct';
+import SignIn from '../sign_in';
+import FourOhFour from '../four_oh_four';
 
 const App = () => {
   return (
