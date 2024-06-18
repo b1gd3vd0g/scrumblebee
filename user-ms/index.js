@@ -14,18 +14,18 @@ app.use('/', router);
 
 // 1. Create an https server to serve app.
 
-const https = require('https');
-const fs = require('fs');
+const http = require('http');
+// const fs = require('fs');
 // ssl certificate and private key
-const options = {
-  cert: fs.readFileSync(''),
-  key: fs.readFileSync('')
-};
-const httpsServer = https.createServer(options, app);
+// const options = {
+//   cert: fs.readFileSync('../'),
+//   key: fs.readFileSync('')
+// };
+const httpServer = http.createServer(app);
 
 // 2. Start the app listening for requests.
 
-const httpsPort = 4043;
-httpsServer.listen(httpsPort, () => {
-  console.log(`scrumblebee-user-microservice listening on port ${httpsPort}.`);
+const httpPort = 4043;
+httpServer.listen(httpPort, () => {
+  console.log(`scrumblebee-user-microservice listening on port ${httpPort}.`);
 });
