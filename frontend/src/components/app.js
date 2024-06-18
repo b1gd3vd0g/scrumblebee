@@ -4,6 +4,8 @@ import CreateAcct from './create_acct';
 import SignIn from './sign_in';
 import FourOhFour from './four_oh_four';
 
+import '../css/app.css';
+
 const App = () => {
   return (
     <BrowserRouter>

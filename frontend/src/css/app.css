@@ -1,0 +1,11 @@
+body {
+  background-color: lightblue;
+}
+
+button {
+  display: block;
+  padding: 0.5em;
+  width: 50%;
+  min-width: fit-content;
+  margin: 0.5em auto;
+}
