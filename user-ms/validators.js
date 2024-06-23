@@ -141,4 +141,10 @@ const validateAll = (un, email, pw) => {
   };
 };
 
-module.exports = { validateEmail, validatePassword, validateUsername };
+module.exports = {
+  prettify,
+  validateAll,
+  validateEmail,
+  validatePassword,
+  validateUsername
+};
