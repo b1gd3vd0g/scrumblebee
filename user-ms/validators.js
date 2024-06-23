@@ -15,6 +15,8 @@ const prettify = (input) => {
   return trimmed.replace(/\s+/g, ' ');
 };
 
+const noVal = { val: '', probs: ['no value provided'] };
+
 const validateUsername = (input) => {
   const poss = {
     tooShort: 'username requires a minimum of 6 characters.',
@@ -24,6 +26,7 @@ const validateUsername = (input) => {
     noStr: 'username is not a string.'
   };
   const un = prettify(input);
+  if (!un) return noVal;
   const probs = [];
   if (typeof un !== 'string') return [poss.noStr];
   if (un.length < 6) probs.push(poss.tooShort);
@@ -106,6 +109,7 @@ const validatePassword = (input) => {
     tooLong: 'password can contain no more than 32 characters.'
   };
   const pw = prettify(input);
+  if (!pw) return noVal;
   const probs = [];
   if (!/[A-Z]/.test(pw)) probs.push(poss.noCap);
   if (!/[a-z]/.test(pw)) probs.push(poss.noLow);
