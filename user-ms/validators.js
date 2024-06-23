@@ -1,70 +1,144 @@
-const validateUsername = (un) => {
-  return (
-    typeof un === 'string' &&
-    // Good length
-    un.length > 5 &&
-    un.length <= 15 &&
-    // No illegal characters
-    /^[A-Za-z0-9._-]+$/.test(un)
-  );
+const { User } = require('./models');
+
+/**
+ * Takes a string and returns it 'prettier' - that is,
+ * extra whitespace between words and along edges is removed.
+ * @param {string} input The string to be prettified
+ * @returns A prettier version of that string.
+ */
+const prettify = (input) => {
+  // type check
+  if (typeof input !== 'string' || input === '') return undefined;
+  // trim additional whitespace from edges
+  const trimmed = input.trim();
+  // get rid of extra spaces
+  return trimmed.replace(/\s+/g, ' ');
 };
 
-const validateEmail = (em) => {
-  // allowed symbols
-  const domainSpCh = '.-';
-  const userSpCh = '!#$%^&*+=|/?_.-';
-  // separate into user and domain
-  const spl = em.split('@');
-  if (spl.length !== 2) return false;
-  const [user, domain] = spl;
-  // evaluate username
-  const userRegex = new RegExp(`^[A-Za-z0-9${userSpCh}]{1,64}$`);
-  if (!userRegex.test(user)) return false;
-  // scan through username
-  for (let i = 0; i < user.length; i++) {
-    // Is it a special character?
-    if (userSpCh.includes(user[i])) {
-      if (
-        // First or last index?
-        i === 0 ||
-        i === user.length - 1 ||
-        // Is the next character a symbol?
-        userSpCh.includes(user[i + 1])
-      ) {
-        return false;
-      }
-    }
+const validateUsername = (input) => {
+  const poss = {
+    tooShort: 'username requires a minimum of 6 characters.',
+    tooLong: 'username can be no more than 24 characters.',
+    alreadyExists: 'username already exists.',
+    illSymb: 'username includes illegal symbols.',
+    noStr: 'username is not a string.'
+  };
+  const un = prettify(input);
+  const probs = [];
+  if (typeof un !== 'string') return [poss.noStr];
+  if (un.length < 6) probs.push(poss.tooShort);
+  else if (un.length > 24) probs.push(poss.tooLong);
+  if (!/^[A-Za-z0-9_.-]+$/.test(un)) probs.push(poss.illSymb);
+  if (!probs.length) {
+    const existingUser = User.findOne({ username: un });
+    if (existingUser) probs.push(poss.alreadyExists);
   }
-  // username should be fine.
-  // evaluate domain
-  const domainRegex = new RegExp(`^A-Za-z0-9${domainSpCh}$`);
-  if (!domainRegex.test(domain)) return false;
-  for (let i = 0; i < domain.length; i++) {
-    if (domainSpCh.includes(domain[i])) {
-      if (
-        i === 0 ||
-        i === user.length - 1 ||
-        domainSpCh.includes(domain[i + 1])
-      ) {
-        return false;
-      }
-    }
-  }
-  // It has passed all my tests.
-  return true;
+  return {
+    val: probs.length ? '' : un,
+    probs: probs
+  };
 };
 
-const validatePassword = (pw) => {
-  return (
-    typeof pw === 'string' &&
-    // contains uppercase, lowercase, number, symbol
-    /[A-Z]/.test(pw) &&
-    /[a-z]/.test(pw) &&
-    /[0-9]/.test(pw) &&
-    /[!@#$%^&*?/+=_-]/.test(pw) &&
-    // no unexpected characters
-    /^[A-Za-z0-9!@#$%^&*?/+=_-]+$/.test(pw)
-  );
+/**
+ * Validates a string representing an email address.
+ * @param {string} input The string to test for validity
+ * @returns an object [val]: the prettified string, [probs]: an array of problems
+ */
+const validateEmail = (input) => {
+  // possible errors
+  const poss = {
+    noAt: 'email address must separate the prefix and the domain with an @',
+    twoAt: 'only one @ allowed',
+    invCharP: 'prefix contains illegal characters',
+    invCharD: 'domain contains illegal characters',
+    edgeSymbP: 'prefix cannot start or end with a symbol',
+    edgeSymbD: 'domain cannot start or end with a symbol',
+    consecSymb: 'email contains consecutive symbols',
+    noDotD: 'domain does not contain any dots'
+  };
+  // prettify
+  const email = prettify(input);
+  if (!email) return noVal;
+
+  const probs = [];
+  // split pref/dom
+  const spl = email.split('@');
+
+  if (spl.length < 2) {
+    probs.push(poss.noAt);
+  } else if (spl.length > 2) {
+    probs.push(poss.twoAt);
+  } else {
+    // we have a prefix and a domain.
+    //proceed to more advanced testing.
+    const [prefix, domain] = spl;
+    // allowed symbols in dom and pref
+    const pSym = '_.-';
+    const dSym = '.-';
+    // ensure valid chars
+    if (!new RegExp(`^[A-Za-z0-9${pSym}]+$`).test(prefix))
+      probs.push(poss.invCharP);
+    if (!new RegExp(`^[A-Za-z0-9${dSym}]+$`).test(domain))
+      probs.push(poss.invCharD);
+    // ensure no edge symbols
+    if (pSym.includes(prefix[0]) || pSym.includes(prefix[prefix.length - 1]))
+      probs.push(poss.edgeSymbP);
+    if (dSym.includes(domain[0]) || dSym.includes(domain[domain.length - 1]))
+      probs.push(poss.edgeSymbD);
+    // ensure no consecutive symbols
+    if (/[._-][._-]/.test(email)) probs.push(poss.consecSymb);
+    if (!domain.includes('.')) probs.push(poss.noDotD);
+  }
+  return {
+    val: probs.length ? '' : email,
+    probs: probs
+  };
+};
+
+const validatePassword = (input) => {
+  const poss = {
+    noCap: 'password must include a capital letter.',
+    noLow: 'password must contain a lowercase letter.',
+    noNum: 'password must contain a number.',
+    noSymb: 'password must include one of these symbols: !@#$%^&*?/+=_-',
+    illChar: 'password contains an illegal character.',
+    tooShort: 'password must contain at least 8 characters.',
+    tooLong: 'password can contain no more than 32 characters.'
+  };
+  const pw = prettify(input);
+  const probs = [];
+  if (!/[A-Z]/.test(pw)) probs.push(poss.noCap);
+  if (!/[a-z]/.test(pw)) probs.push(poss.noLow);
+  if (!/[0-9]/.test(pw)) probs.push(poss.noNum);
+  if (!/[!@#$%^&*?/+=_-]/.test(pw)) probs.push(poss.noSymb);
+  if (!/[A-Za-z0-9!@#$%^&*?/+=_-]/.test(pw)) probs.push(poss.illChar);
+  if (pw.length < 8) probs.push(poss.tooShort);
+  if (pw.length > 32) probs.push(poss.tooLong);
+  return { val: probs.length ? '' : pw, probs: probs };
+};
+
+const validateAll = (un, email, pw) => {
+  const unVal = validateUsername(un);
+  const emailVal = validateEmail(email);
+  const pwVal = validatePassword(pw);
+  if (unVal.val && emailVal.val && pwVal.val) {
+    return {
+      valid: true,
+      values: {
+        username: unVal.val,
+        email: emailVal.val,
+        password: pwVal.val
+      }
+    };
+  }
+  const probs = {};
+  if (!unVal.val) probs.username = unVal.probs;
+  if (!emailVal.val) probs.email = emailVal.probs;
+  if (!pwVal.val) probs.password = pwVal.probs;
+  return {
+    valid: false,
+    probs: probs
+  };
 };
 
 module.exports = { validateEmail, validatePassword, validateUsername };
