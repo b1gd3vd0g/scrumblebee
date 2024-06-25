@@ -1,0 +1,4 @@
+# always ignore dependencies 
+node_modules
+# always ignore config files
+.env
