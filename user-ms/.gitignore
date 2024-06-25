@@ -1,4 +1,2 @@
-node_modules
-config.json
+# file which would reveal exactly how my hashing works.
 hashing.js
-.env
