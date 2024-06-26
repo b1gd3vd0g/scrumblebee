@@ -29,24 +29,15 @@ const authenticateUserLogin = async (usernameOrEmail, password) => {
       const salt = existingAcct.salt;
       const hashedPw = hash(pw, salt);
       if (hashedPw === existingAcct.password) {
-        const jwt = require('jsonwebtoken');
-        const token = jwt.sign(
-          {
-            uid: existingAcct._id,
-            un: existingAcct.un
-          },
-          require('./config.json').jwtSecret,
-          {
-            expiresIn: 3_600 // 1 hr = 3_600 sec
-          }
-        );
-
-        jwt.decode();
-        return { success: true, code: 200, token: token };
+        return {
+          success: true,
+          uid: existingAcct._id,
+          username: existingAcct.username
+        };
       }
     }
     // 401 exit: input is valid, authentication failed. incorrect login info.
-    return { success: false, code: 401, message: 'auth failed' };
+    return { success: false, message: 'incorrect login info.' };
   } catch (e) {
     // 500 exit: server-side error
     return sse(e);
