@@ -24,4 +24,4 @@ const authenticateUserLogin = async (usernameOrEmail, password) => {
   return false;
 };
 
-module.exports = { createUser, authenticateUserLogin };
+module.exports = { authenticateUserLogin };
