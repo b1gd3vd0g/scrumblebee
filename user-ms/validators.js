@@ -1,5 +1,7 @@
 const { User } = require('./models');
 
+const { prettify } = require('./functions');
+
 const noVal = { val: '', probs: ['no value provided'] };
 
 const validateUsername = (input) => {
