@@ -5,8 +5,9 @@ require('dotenv').config();
 
 // 1. Create the express app!
 
+// Configure app:
 const app = express();
-// Make app use JSON instead of strings.
+app.use(cors());
 app.use(express.json());
 app.use(
   session({
@@ -15,11 +16,7 @@ app.use(
     saveUninitialized: false
   })
 );
-// Enable cross-origin resource sharing.
-app.use(cors());
-// Define http methods and routes.
-const router = require('./base_router');
-app.use('/', router);
+app.use('/', require('./base_router'));
 
 // 2. Start the servers!
 
