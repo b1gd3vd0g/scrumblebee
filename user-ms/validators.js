@@ -1,20 +1,5 @@
 const { User } = require('./models');
 
-/**
- * Takes a string and returns it 'prettier' - that is,
- * extra whitespace between words and along edges is removed.
- * @param {string} input The string to be prettified
- * @returns A prettier version of that string.
- */
-const prettify = (input) => {
-  // type check
-  if (typeof input !== 'string' || input === '') return undefined;
-  // trim additional whitespace from edges
-  const trimmed = input.trim();
-  // get rid of extra spaces
-  return trimmed.replace(/\s+/g, ' ');
-};
-
 const noVal = { val: '', probs: ['no value provided'] };
 
 const validateUsername = (input) => {
