@@ -1,0 +1,19 @@
+{
+  "name": "scrumblebee-project-microservice",
+  "version": "0.1.0",
+  "description": "handles all project functions for the application scrumblebee",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Devin Peevy <devin@bigdevdog.com>",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mongodb": "^6.7.0",
+    "mongoose": "^8.4.4"
+  }
+}
