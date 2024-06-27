@@ -15,4 +15,4 @@ const prettify = (input) => {
   return trimmed.replace(/\s+/g, ' ');
 };
 
-module.exports = { isApiKey, prettify };
+module.exports = { prettify };
