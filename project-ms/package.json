@@ -4,7 +4,7 @@
   "description": "handles all project functions for the application scrumblebee",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "author": "Devin Peevy <devin@bigdevdog.com>",
   "license": "ISC",
