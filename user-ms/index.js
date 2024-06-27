@@ -3,7 +3,7 @@ const cors = require('cors');
 const session = require('express-session');
 require('dotenv').config();
 
-// 0. Create express app.
+// 1. Create the express app!
 
 const app = express();
 // Make app use JSON instead of strings.
@@ -21,27 +21,40 @@ app.use(cors());
 const router = require('./base_router');
 app.use('/', router);
 
-// 1.1: create the http server (for testing purposes)
+// 2. Start the servers!
 
-const httpServer = require('http').createServer(app);
-const httpPort = 4044;
-httpServer.listen(httpPort, () => {
-  console.log(
-    `scrumblebee-user-microservice: http listening on port ${httpPort}.`
-  );
-});
+const mode = process.env.MODE;
+const host = process.env.HOST;
+const port = process.env.USER_PORT;
 
-// 1.2: create the https server (for production)
+// Now, based on the mode, we're going to do a couple things differently
+switch (mode) {
+  // DEV mode - localhost, http server.
+  case 'DEV':
+    const httpServer = require('http').createServer(app);
+    httpServer.listen(port, () => {
+      console.log(
+        `${host}:${port} is listening for the scrumblebee-user-microservice`
+      );
+    });
+    break;
 
-// const fs = require('fs');
-// const options = {
-//   cert: fs.readFileSync(process.env.CERT_PATH),
-//   key: fs.readFileSync(process.env.KEY_PATH)
-// };
-// const httpsServer = require('https').createServer(options, app);
-// const httpsPort = 4045;
-// httpsServer.listen(httpsPort, () => {
-//   console.log(
-//     `scrumblebee-user-microservice: https listening on port ${httpsPort}.`
-//   );
-// });
+  // PROD mode - hosted on www.api.bigdevdog.com, https server.
+  case 'PROD':
+    const fs = require('fs');
+    const options = {
+      cert: fs.readFileSync(process.env.CERT_PATH),
+      key: fs.readFileSync(process.env.KEY_PATH)
+    };
+    const httpsServer = require('https').createServer(options, app);
+    httpsServer.listen(port, () => {
+      console.log(
+        `${host}:${port} is listening for the scrumblebee-user-microservice`
+      );
+    });
+    break;
+
+  // This should not happen.
+  default:
+    console.log('Check configuration file - MODE is undefined or invalid.');
+}
