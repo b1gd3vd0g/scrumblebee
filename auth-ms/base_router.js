@@ -65,4 +65,44 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  // 1. Ensure that API key is present and valid.
+  const authHeader = req.headers.authorization;
+  if (typeof authHeader !== 'string') {
+    return res.status(403).json({ message: 'no api key was found!' });
+  }
+  const token = authHeader.substring('Bearer '.length);
+  if (!isApiKey(token)) {
+    return res.status(403).json({ message: 'api key is invalid!' });
+  }
+
+  // 2. Ensure contents are provided.
+  const username = prettify(req.query.username);
+  const uid = prettify(req.query.uid);
+  const scrumblebeeHeader = prettify(req.headers.scrumblebee);
+  if (!username || !uid || !scrumblebeeHeader) {
+    return res
+      .status(400)
+      .json({ message: 'missing username, uid, or scrumblebee header.' });
+  }
+
+  // 3. Ensure token is valid.
+  const scrToken = scrumblebeeHeader.substring('Bearer '.length);
+  try {
+    const payload = jwt.verify(scrToken, process.env.SESSION_TOKEN_SECRET);
+    if (uid !== payload.uid || username !== payload.username) {
+      return res.status(401).json({
+        message: 'token information does not match query parameters!'
+      });
+    }
+    // if we're here, the token is indeed valid.
+    return res.status(200).json({});
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'token is expired!' });
+    }
+    return res.status(401).json({ message: 'token cannot be parsed.' });
+  }
+});
+
 module.exports = router;
