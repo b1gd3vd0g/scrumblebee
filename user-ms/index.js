@@ -7,7 +7,12 @@ require('dotenv').config();
 
 // Configure app:
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: true
+  })
+);
 app.use(express.json());
 app.use(
   session({
@@ -16,7 +21,7 @@ app.use(
     saveUninitialized: false
   })
 );
-app.use('/', require('./base_router'));
+app.use('/', require('./routers/base_router'));
 
 // 2. Start the servers!
 
