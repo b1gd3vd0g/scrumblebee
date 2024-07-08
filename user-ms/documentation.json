@@ -6,11 +6,11 @@
   },
   "servers": [
     {
-      "url": "https://www.api.bigdevdog.com:6903",
+      "url": "https://www.api.bigdevdog.com:6905",
       "description": "live production server"
     },
     {
-      "url": "http://localhost:6904",
+      "url": "http://localhost:6906",
       "description": "local development server"
     }
   ],
