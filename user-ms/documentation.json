@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "scrumblebee-user-ms",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://www.api.bigdevdog.com:6903",
+      "description": "live production server"
+    },
+    {
+      "url": "http://localhost:6904",
+      "description": "local development server"
+    }
+  ],
+  "paths": {
+    "/": {},
+    "/session": {
+      "post": {
+        "tags": ["session"],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/LoginInfo"
+        },
+        "responses": {
+          "200": {
+            "description": "Session started and valid for 60 minutes."
+          },
+          "400": {
+            "description": "Request is missing username or password."
+          },
+          "404": {
+            "description": "Login credentials do not match our records."
+          },
+          "500": {
+            "description": "Server-side error."
+          }
+        }
+      },
+      "get": {
+        "tags": ["session"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionCookie"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session is valid!"
+          },
+          "401": {
+            "description": "Session is invalid or absent."
+          },
+          "500": {
+            "description": "Server-side error."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["session"],
+        "responses": {
+          "200": {
+            "description": "Session ended."
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "tags": ["verify"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ApiKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/LoginInfo"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SessionInfo"
+          },
+          "400": {
+            "description": "Missing username or password."
+          },
+          "401": {
+            "description": "Missing or invalid API key."
+          },
+          "404": {
+            "description": "Login information does not match our records."
+          },
+          "500": {
+            "description": "Server side error."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ApiKey": {
+        "in": "header",
+        "name": "authorization",
+        "description": "API key",
+        "example": "Bearer [token]",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "SessionCookie": {
+        "in": "cookie",
+        "name": "user-ms",
+        "description": "The session cookie.",
+        "schema": {
+          "$ref": "#/components/schemas/SessionCookie"
+        }
+      }
+    },
+    "requestBodies": {
+      "LoginInfo": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LoginInfo"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "SessionInfo": {
+        "description": "Login information was correct. Passing username and uid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SessionInfo"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "LoginInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "password"]
+      },
+      "SessionCookie": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "uid", "token"]
+      },
+      "SessionInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "uid"]
+      }
+    }
+  }
+}
