@@ -1,6 +1,4 @@
-const { User } = require('./models');
-
-const { prettify } = require('./functions');
+const { prettify } = require('../functions');
 
 const noVal = { val: '', probs: ['no value provided'] };
 
@@ -19,10 +17,6 @@ const validateUsername = (input) => {
   if (un.length < 6) probs.push(poss.tooShort);
   else if (un.length > 24) probs.push(poss.tooLong);
   if (!/^[A-Za-z0-9_.-]+$/.test(un)) probs.push(poss.illSymb);
-  if (!probs.length) {
-    const existingUser = User.findOne({ username: un });
-    if (existingUser) probs.push(poss.alreadyExists);
-  }
   return {
     val: probs.length ? '' : un,
     probs: probs
@@ -44,7 +38,8 @@ const validateEmail = (input) => {
     edgeSymbP: 'prefix cannot start or end with a symbol',
     edgeSymbD: 'domain cannot start or end with a symbol',
     consecSymb: 'email contains consecutive symbols',
-    noDotD: 'domain does not contain any dots'
+    noDotD: 'domain does not contain any dots',
+    alreadyExists: 'username already exists.'
   };
   // prettify
   const email = prettify(input);
