@@ -1,3 +1,12 @@
+const jwt = require('jsonwebtoken');
+const { isApiKey, prettify } = require('./functions');
+const paths = require('./paths');
+
+const HEADERS = {
+  authorization: `Bearer ${process.env.LOGIN_API_KEY}`,
+  'Content-Type': 'application/json'
+};
+
 const handleSessionGeneration = async (req, res) => {
   console.log('called handleLogin');
   // 1. Ensure that API key is present and valid.
