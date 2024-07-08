@@ -1,4 +1,4 @@
-const { createConnection, Schema, Model } = require('mongoose');
+const { createConnection, Schema } = require('mongoose');
 
 const userSchema = new Schema(
   {
@@ -26,4 +26,6 @@ const userSchema = new Schema(
 
 const connection = createConnection(encodeURI(process.env.DB_CONNECTION));
 
-module.exports = connection.model('User', userSchema);
+const User = connection.model('User', userSchema);
+
+module.exports = User;
