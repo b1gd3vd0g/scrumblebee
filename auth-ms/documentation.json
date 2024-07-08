@@ -7,11 +7,11 @@
   "servers": [
     {
       "description": "live production server",
-      "url": "https://www.api.bigdevdog.com:6901"
+      "url": "https://www.api.bigdevdog.com:6903"
     },
     {
       "description": "local development server",
-      "url": "http://localhost:6902"
+      "url": "http://localhost:6904"
     }
   ],
   "paths": {
