@@ -1,0 +1,209 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "scrumblebee-authentication-microservice",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "description": "live production server",
+      "url": "https://www.api.bigdevdog.com:6901"
+    },
+    {
+      "description": "local development server",
+      "url": "http://localhost:6902"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Verify that session token contains username and uid and is unexpired.",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "SessionToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/APIKey"
+          },
+          {
+            "$ref": "#/components/parameters/SessionToken"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/SessionInfo"
+        },
+        "responses": {
+          "200": {
+            "description": "The session information is valid."
+          },
+          "400": {
+            "description": "Request is missing username, uid, or scrumblebee token."
+          },
+          "401": {
+            "description": "API Key is missing or invalid."
+          },
+          "403": {
+            "description": "Session is invalid."
+          },
+          "500": {
+            "description": "Server-side error."
+          }
+        }
+      },
+      "post": {
+        "description": "Attempt a login, and return a session token, username, and uid upon success.",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "description": "API Key",
+            "example": ""
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/LoginInfo"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Session"
+          },
+          "400": {
+            "description": "Request is missing username or password."
+          },
+          "401": {
+            "description": "API Key is missing or invalid."
+          },
+          "404": {
+            "description": "Login credentials do not match our records."
+          },
+          "500": {
+            "description": "Server-side error."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "APIKey": {
+        "in": "header",
+        "name": "authorization",
+        "description": "API Key",
+        "example": "Bearer [token]",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "SessionToken": {
+        "in": "header",
+        "name": "scrumblebee",
+        "description": "Session token",
+        "example": "Bearer [token]",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "requestBodies": {
+      "SessionInfo": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SessionInfo"
+            }
+          }
+        }
+      },
+      "LoginInfo": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LoginInfo"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Session": {
+        "description": "Login successful. Passing session info.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Session"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Session": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "uid", "token"]
+      },
+      "SessionInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "uid"]
+      },
+      "LoginInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "password"]
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization"
+      },
+      "SessionToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "scrumblebee"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKey": [],
+      "SessionToken": []
+    }
+  ]
+}
