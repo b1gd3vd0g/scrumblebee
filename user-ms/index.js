@@ -18,7 +18,8 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    name: 'user-session'
   })
 );
 app.use('/', require('./routers/base_router'));
